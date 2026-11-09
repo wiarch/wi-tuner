@@ -33,3 +33,4 @@ Homestead.yaml
 Thumbs.db
 
 **/node_modules/
+**/coverage/
