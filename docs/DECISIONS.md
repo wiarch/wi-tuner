@@ -14,3 +14,11 @@
 - Los temperamentos guardan desvíos por clase de nota relativos al temperamento igual, anclados a la frecuencia A4 elegida para que el control de referencia siga siendo exacto.
 - El scheduler del metrónomo no crea intervalos ni temporizadores: el host lo consulta con su reloj de audio y agenda eventos dentro de la ventana lookahead.
 - Los instrumentos se describen por presets de cuerda; piano tiene su rango de 88 notas, mientras que el modo cromático no impone cuerdas.
+
+## Fase 2: captura de audio
+
+- La app mantiene una máquina de estados única y delega la captura mediante `AudioInputProvider`, de modo que un proveedor nativo pueda sustituir al proveedor Web Audio.
+- El navegador captura con `AudioWorklet`; las opciones de echo cancellation, reducción de ruido y AGC del navegador quedan desactivadas. El DSP recibe solo buffers en memoria.
+- El worklet produce ventanas de 40 ms con saltos de 20 ms, es decir, hasta 50 actualizaciones por segundo; la app informa la latencia de ventana más el tiempo de análisis medido.
+- El watchdog consulta cada 200 ms y reinicia el stream y el contexto si pasan más de 1 s sin frames. El regreso a primer plano, cambios de dispositivo o permiso e interrupciones del contexto pasan por la misma ruta de recuperación.
+- El sample rate interno se solicita entre 8 y 48 kHz; el worklet aplica decimación por bloques si el contexto entrega una tasa superior.
