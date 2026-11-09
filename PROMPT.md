@@ -1,10 +1,10 @@
-# WI Tone — Master Development Prompt
+# WI Tuner — Master Development Prompt
 
 Act as a senior Laravel and JavaScript engineer with experience in browser audio processing, music technology, accessibility and privacy-focused application design.
 
 ## Mission
 
-Continue developing **WI Tone**, a polished browser-first digital instrument tuner inspired by the usability of modern online tuners. The core experience is chromatic tuning through the device microphone, initially optimized for guitar and bass, with an extensible model for other instruments.
+Continue developing **WI Tuner**, a polished browser-first digital instrument tuner inspired by the usability of modern online tuners. The core experience is chromatic tuning through the device microphone, initially optimized for guitar and bass, with an extensible model for other instruments.
 
 The application should feel fast, clear, accurate, responsive and dependable. The tuner is the product; auxiliary music-practice utilities are secondary.
 

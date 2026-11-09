@@ -1,0 +1,9 @@
+node_modules
+vendor
+storage
+public/build
+apps/*/dist
+apps/*/.astro
+packages/*/dist
+pnpm-lock.yaml
+

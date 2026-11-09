@@ -109,7 +109,7 @@ function renderPopoverContent(chordName, viewMode, library) {
 }
 
 function selectChord(chord, library) {
-    document.dispatchEvent(new CustomEvent('witone:chord-select', {
+    document.dispatchEvent(new CustomEvent('wituner:chord-select', {
         detail: { chord, library },
     }));
 }

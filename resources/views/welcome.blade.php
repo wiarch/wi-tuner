@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Plataforma de acordes de alabanza y gestión de servicios para tu equipo de adoración.">
 
-    <title>{{ config('app.name', 'Wi-Tone') }} — Acordes y servicios de adoración</title>
+    <title>{{ config('app.name', 'Wi-Tuner') }} — Acordes y servicios de adoración</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700&display=swap" rel="stylesheet">
@@ -150,7 +150,7 @@
                 <div class="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-600/20 to-violet-600/20 px-8 py-16 backdrop-blur">
                     <h2 class="text-3xl font-bold text-white sm:text-4xl">Tu equipo merece llegar preparado</h2>
                     <p class="mx-auto mt-4 max-w-lg text-slate-300">
-                        Únete a Wi-Tone y deja de improvisar los domingos. Centraliza acordes, repertorios y planes en una sola plataforma.
+                        Únete a Wi-Tuner y deja de improvisar los domingos. Centraliza acordes, repertorios y planes en una sola plataforma.
                     </p>
                     <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         @if (Route::has('register'))

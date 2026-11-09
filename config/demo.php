@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'email' => 'test@witone.test',
+    'email' => 'test@wituner.test',
     'password' => 'password',
 ];

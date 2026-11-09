@@ -356,7 +356,7 @@ function createChordDiagramVisualizer(root, embeddedLibrary, diagramsUrl) {
         btn.addEventListener('click', () => selectChord(btn.dataset.chordPick));
     });
 
-    document.addEventListener('witone:chord-select', (e) => {
+    document.addEventListener('wituner:chord-select', (e) => {
         if (e.detail?.chord) {
             selectChord(e.detail.chord);
         }

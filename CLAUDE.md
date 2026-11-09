@@ -1,8 +1,8 @@
-# CLAUDE.md — WI Tone
+# CLAUDE.md — WI Tuner
 
 ## Product identity
 
-WI Tone is a browser-first digital instrument tuner. Its primary job is helping musicians tune instruments accurately and quickly, beginning with guitar and bass. It is not primarily a worship-planning, song-catalog or team-management product.
+WI Tuner is a browser-first digital instrument tuner. Its primary job is helping musicians tune instruments accurately and quickly, beginning with guitar and bass. It is not primarily a worship-planning, song-catalog or team-management product.
 
 Read these files before making substantial changes:
 - `README.md`

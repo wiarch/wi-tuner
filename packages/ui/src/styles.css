@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+.wi-button {
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white transition-colors;
+}
+
+.wi-button:hover {
+  @apply bg-slate-700;
+}
+
+.wi-button:focus-visible {
+  @apply outline-2 outline-offset-2 outline-sky-700;
+}
+

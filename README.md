@@ -1,119 +1,68 @@
-# WI Tone
+# Wi-Tuner
 
-**Afinador musical digital para guitarra y bajo, accesible desde el navegador.**
+**Afinador cromático y herramientas de práctica, con procesamiento de audio local.**
 
-WI Tone es una plataforma de herramientas musicales centrada en la afinación de instrumentos. Su objetivo es ofrecer una experiencia sencilla y fiable para afinar guitarra, bajo y otros instrumentos, directamente desde el navegador y con una arquitectura preparada para futuras experiencias de escritorio y móviles.
+Wi-Tuner ayuda a afinar instrumentos con claridad desde el navegador y prepara una misma base para web, PWA y futuras aplicaciones móviles. El audio del afinador se analizará en el dispositivo y no se grabará ni se transmitirá.
 
-> Estado: proyecto en evolución. Este repositorio ya contiene un afinador basado en Web Audio API, un metrónomo y herramientas de teoría musical. Las capacidades descritas como futuras en la documentación no deben interpretarse como funcionalidades ya implementadas.
+> Estado: Fase 0. El repositorio conserva temporalmente la aplicación Laravel existente y añade los cimientos del nuevo monorepo. La app React y la landing están inicializadas; el flujo completo de afinación, el modo estroboscópico y las plataformas nativas se desarrollarán en fases posteriores.
 
-## Enfoque del producto
+## Estructura
 
-La experiencia principal es un afinador cromático con detección de frecuencia mediante micrófono, indicación visual de desviación en cents y presets de referencia estándar y Drop D para guitarra y bajo. El motor de detección y la lógica musical están separados en módulos JavaScript testeables.
-
-### Funcionalidades existentes
-
-- Afinador cromático en navegador mediante Web Audio API.
-- Detección de frecuencia mediante un estimador YIN-style con análisis acotado y decimado.
-- Conversión de frecuencia a nota, octava y desviación en cents.
-- Selector de guitarra y bajo con afinaciones estándar y Drop D.
-- Tonos de referencia generados desde los datos del preset seleccionado.
-- Metrónomo con tempo ajustable y compases 4/4, 3/4 y 6/8.
-- Círculo de quintas y utilidades de teoría musical.
-- Aplicación web construida con Laravel, Blade, JavaScript y Vite.
-
-### Dirección del producto
-
-- Ampliar el catálogo de afinaciones de guitarra y bajo más allá de estándar y Drop D.
-- Selector de instrumento, afinación y referencia de frecuencia (A4).
-- Indicador de aguja y estado visual: bemol, afinado o sostenido.
-- Calibración y controles de sensibilidad para distintos entornos.
-- Soporte progresivo para ukelele, violín y otros instrumentos.
-- Experiencia responsive y PWA; escritorio y móvil como objetivos de evolución.
-- Herramientas complementarias: metrónomo, tonos de referencia, acordes y escalas.
-
-Consulta [PRODUCT.md](docs/PRODUCT.md) y [ROADMAP.md](docs/ROADMAP.md) para distinguir el alcance actual del plan futuro.
-
-## Stack tecnológico
-
-- PHP 8.3+
-- Laravel 13
-- Blade
-- JavaScript
-- Web Audio API y MediaDevices API
-- Vite
-- Tailwind CSS
+- `apps/app`: aplicación React + Vite, PWA, i18next, Zustand, IndexedDB y configuración de Capacitor.
+- `apps/landing`: landing Astro con contenido en español e inglés.
+- `packages/dsp-core`: motor musical y DSP en TypeScript puro.
+- `packages/ui`: componentes React compartidos, Tailwind CSS v4 y Radix UI.
+- `app/`, `resources/`, `routes/` y `composer.json`: aplicación Laravel existente, conservada durante la transición.
+- `docs/DECISIONS.md`: decisiones de migración y alcance.
 
 ## Requisitos
 
-- PHP 8.3 o superior.
-- Composer.
-- Node.js y npm.
-- Una base de datos compatible con Laravel (SQLite es adecuada para desarrollo local).
-- Navegador moderno con soporte para Web Audio API y acceso al micrófono.
+- Node.js 22.23.4 o superior.
+- pnpm 11.25.0.
+- PHP 8.3 y Composer para ejecutar la aplicación Laravel conservada.
 
-El acceso al micrófono requiere un contexto seguro: HTTPS en despliegues y normalmente `localhost` en desarrollo.
+## Preparar y verificar el monorepo
 
-## Instalación
+```sh
+pnpm install
+pnpm build
+pnpm test
+pnpm lint
+pnpm typecheck
+```
 
-```bash
-git clone https://github.com/wiarch/wi-tone.git
-cd wi-tone
+Desarrollo de la nueva app y landing:
+
+```sh
+pnpm dev:app
+pnpm dev:landing
+```
+
+La app muestra por ahora la estructura del producto, detecta inglés o español, instala su service worker y usa los paquetes compartidos. El afinador con micrófono se implementará en la siguiente fase.
+
+## Aplicación Laravel conservada
+
+La aplicación anterior se mantiene para no eliminar rutas, datos o pantallas durante la transición. Para iniciarla, instala Composer, configura `.env` y ejecuta:
+
+```sh
 composer install
-cp .env.example .env
 php artisan key:generate
-```
-
-Configura la conexión de base de datos en `.env`. Para SQLite:
-
-```bash
-touch database/database.sqlite
-```
-
-Asegúrate de que `.env` tenga `DB_CONNECTION=sqlite` y que la ruta de la base de datos sea la correspondiente a tu entorno. Después:
-
-```bash
-php artisan migrate
-npm install
-npm test
-npm run build
-```
-
-Inicia el entorno de desarrollo:
-
-```bash
+pnpm install
 composer run dev
 ```
 
-Abre la URL local que indique Laravel. Para probar el afinador, concede permiso de micrófono al navegador.
+Su interfaz heredada no representa aún el diseño final de Wi-Tuner. La extracción o eliminación de módulos antiguos se hará con una migración revisada y reversible.
 
-## Privacidad y permisos
+## Privacidad y seguridad
 
-- El afinador necesita permiso explícito del navegador para acceder al micrófono.
-- El procesamiento de audio del afinador actual se realiza en el cliente mediante Web Audio API.
-- La aplicación debe detener las pistas del micrófono cuando el usuario detenga el afinador o abandone la experiencia.
-- No se debe grabar, almacenar ni transmitir audio sin una función explícita, consentimiento informado y documentación correspondiente.
-- En producción, sirve la aplicación mediante HTTPS.
+- El acceso al micrófono requiere consentimiento del navegador y un contexto HTTPS seguro.
+- La captura futura debe desactivar echo cancellation, noise suppression y automatic gain control.
+- El audio se procesa en memoria en el dispositivo; no se graba ni se transmite.
+- Las preferencias se almacenan localmente y la app ofrecerá una acción para borrar los datos locales.
+- No hay analítica de terceros, anuncios ni SDK publicitarios.
 
-Consulta [SECURITY.md](docs/SECURITY.md).
-
-## Estructura de documentación
-
-- [PRODUCT.md](docs/PRODUCT.md): visión, usuarios, alcance y principios.
-- [ARCHITECTURE.md](docs/ARCHITECTURE.md): arquitectura actual y evolución propuesta.
-- [ROADMAP.md](docs/ROADMAP.md): fases de desarrollo.
-- [SECURITY.md](docs/SECURITY.md): privacidad, permisos y controles técnicos.
-- [CONTRIBUTING.md](CONTRIBUTING.md): pautas de contribución.
-- [CLAUDE.md](CLAUDE.md): contexto e instrucciones para asistentes de programación.
-- [PROMPT.md](PROMPT.md): prompt maestro para continuar el desarrollo con Claude.
-
-## Módulos heredados
-
-El código actual también incluye gestión de canciones, acordes, contactos y planes de servicio. Estos módulos pertenecen al enfoque anterior del proyecto. Se mantienen en el repositorio por compatibilidad y no forman parte del núcleo del nuevo WI Tone. Su eliminación o extracción debe realizarse en una tarea separada, después de revisar dependencias, rutas, datos y migraciones.
+Consulta [SECURITY.md](docs/SECURITY.md), [PRODUCT.md](docs/PRODUCT.md), [ARCHITECTURE.md](docs/ARCHITECTURE.md) y [ROADMAP.md](docs/ROADMAP.md).
 
 ## Licencia
 
-Este proyecto se distribuye bajo la [licencia MIT](LICENSE).
-
----
-
-Parte del ecosistema **[WI Arch](https://github.com/wiarch)**.
+Este proyecto se distribuye bajo la [licencia MIT](LICENSE) y forma parte del ecosistema WI Arch.

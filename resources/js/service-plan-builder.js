@@ -164,7 +164,7 @@ export function initServicePlanBuilder(root) {
 
         bindListInteractions();
         syncHidden();
-        window.witone?.initSelect2(listEl);
+        window.wituner?.initSelect2(listEl);
     }
 
     function bindListInteractions() {

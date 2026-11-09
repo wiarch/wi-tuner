@@ -1,92 +1,23 @@
-# WI Tone — Architecture
+# Wi-Tuner — Arquitectura
 
-## 1. Current architecture
+## Estado de Fase 0
 
-WI Tone is a Laravel application with server-rendered Blade views and browser-side JavaScript.
+El repositorio empieza una transición gradual. La aplicación Laravel existente se conserva temporalmente para proteger sus rutas y datos; la nueva arquitectura vive en los workspaces y no depende del backend Laravel.
 
-- **Backend:** PHP 8.3+ and Laravel 13.
-- **Presentation:** Blade templates and Tailwind CSS.
-- **Frontend build:** Vite.
-- **Audio:** browser Web Audio API and MediaDevices API.
-- **Current tuner entry point:** `resources/views/tools/tuner.blade.php`.
-- **Current audio/tool UI logic:** `resources/js/musician-tools.js`.
-- **Pitch detection:** `resources/js/music/pitch-detection.js`.
-- **Note math and presets:** `resources/js/music/tuning.js`.
-- **Current routes:** `routes/web.php`, including `tools.tuner` and `tools.metronome`.
+## Monorepo
 
-The tuner obtains a microphone MediaStream, connects it to an AnalyserNode and estimates the fundamental frequency with a bounded YIN-style difference function over a decimated sample buffer. The detector returns frequency, RMS level and a clarity estimate. The tuning module maps frequencies to equal-tempered notes and exposes data-driven standard and Drop D guitar/bass presets. Reference tones are generated with an OscillatorNode.
+- `apps/app`: React 19, Vite, TypeScript, PWA, i18next, Zustand, idb-keyval y Capacitor.
+- `apps/landing`: Astro y Tailwind CSS.
+- `packages/dsp-core`: cálculo musical y procesamiento DSP en TypeScript puro, sin dependencias de UI.
+- `packages/ui`: componentes React compartidos con Tailwind CSS v4 y Radix UI.
+- Turborepo orquesta build, test, lint y typecheck. pnpm administra dependencias y workspaces.
 
-## 2. Proposed logical boundaries
+## Límites técnicos
 
-As the tuner grows, split the current combined JavaScript module into focused units:
+El motor DSP no puede depender de React, DOM, APIs de audio ni almacenamiento. La app obtiene muestras del micrófono con consentimiento y pasa buffers en memoria al motor. Cualquier implementación de captura debe usar `echoCancellation: false`, `noiseSuppression: false` y `autoGainControl: false`, y liberar pistas y nodos cuando se detenga.
 
-- `audio/audio-input`: microphone permission, stream lifecycle and analyser setup.
-- `audio/pitch-detection`: frequency estimation and confidence/quality metrics.
-- `music/note-theory`: frequency-to-note conversion, MIDI note and cents math.
-- `tuning/instrument-presets`: instrument and tuning definitions.
-- `tuning/tuning-engine`: comparison between measured pitch and selected target.
-- `audio/reference-tone`: oscillator-based reference tone playback.
-- `ui/tuner-controller`: DOM bindings and accessible UI state.
-- `metronome`: metronome scheduling and UI.
-- `theory`: circle-of-fifths and related reference tools.
+La landing no accede al micrófono. La app y la PWA comparten el mismo código que después empaquetará Capacitor para Android e iOS.
 
-The pitch detector and tuning math/preset modules already exist at `resources/js/music/`. The remaining boundaries are proposed future extractions. Introduce them incrementally and keep the current routes and views working during the transition.
+## Aplicación heredada
 
-## 3. Audio processing flow
-
-1. User activates the tuner.
-2. Browser requests microphone permission.
-3. The application creates an AudioContext and MediaStreamAudioSourceNode.
-4. AnalyserNode supplies time-domain samples.
-5. The pitch detector estimates the fundamental frequency and a confidence/quality value.
-6. The note engine maps frequency to the nearest equal-tempered note using the configured A4 reference.
-7. The tuning engine compares the measured pitch with the selected target.
-8. UI displays note, frequency, cents and a stable tuning state.
-9. User stops the tuner; tracks, animation frames and audio resources are released.
-
-The current implementation covers the initial flow and uses an 8192-sample analyser window, decimated input and a YIN-style estimator. Microphone tracks and audio nodes are released when stopped or when the page is hidden. Instrument and tuning selectors drive the reference-tone buttons. Temporal stability filtering, applying the selected string as the live tuner target, configurable A4 and real-device validation remain planned.
-
-## 4. Tuning data model
-
-Instrument presets should be represented as data, not UI-specific conditionals. A preset should include:
-- Stable identifier.
-- Instrument identifier.
-- Display name and description.
-- Ordered string definitions.
-- Note name and octave for each string.
-- Target frequency derived from the reference pitch or explicitly validated.
-- Optional metadata such as supported range or tuning family.
-
-Do not assume all instruments have six strings. Keep chromatic mode separate from a selected-string preset mode.
-
-## 5. Browser compatibility
-
-Microphone access requires a secure context in supported browsers (HTTPS, with localhost generally permitted for local development). Feature-detect:
-- `navigator.mediaDevices?.getUserMedia`
-- `window.AudioContext` or supported prefixed fallback where needed
-- `AnalyserNode.getFloatTimeDomainData`
-
-Handle denied permission, missing input devices, unsupported APIs, suspended contexts and device disconnection without crashing.
-
-## 6. Resource lifecycle
-
-The tuner must own and release its resources:
-- Stop each MediaStreamTrack.
-- Cancel requestAnimationFrame loops.
-- Disconnect audio nodes where appropriate.
-- Close AudioContext instances when no longer needed.
-- Clear timers and event listeners on disposal.
-- Avoid opening duplicate microphone streams after repeated start/stop actions.
-
-## 7. Legacy application modules
-
-The current Laravel application also contains song, chord, category, contact and service-plan modules. These are legacy product scope. They should remain isolated while the tuner direction is implemented. A future cleanup must trace routes, controllers, models, migrations, views, navigation, authorization and tests before extraction or removal.
-
-## 8. Testing strategy
-
-- Unit tests for frequency-to-note conversion and cents calculation.
-- Unit tests for preset shape, ordering and target frequencies.
-- Deterministic pitch detector tests using generated sample buffers at known frequencies.
-- Edge cases: silence, noise, weak signals, harmonics, low-frequency bass notes and out-of-range inputs.
-- Browser tests for permission denial, start/stop lifecycle and responsive UI.
-- Laravel feature tests for routes and any server-side preferences added later.
+Laravel, Blade y sus módulos de canciones, contactos y planes se mantienen en la raíz durante la transición. No se consideran parte del nuevo producto. Su extracción se hará en una fase aparte, con inventario de rutas, datos y usuarios, y un plan de rollback.

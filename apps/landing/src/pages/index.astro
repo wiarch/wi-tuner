@@ -1,0 +1,104 @@
+---
+import { landingCopy } from "../content";
+import "../styles/global.css";
+
+const copy = landingCopy.es;
+const appUrl = import.meta.env.PUBLIC_APP_URL ?? "/app/";
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta
+      name="description"
+      content="Wi-Tuner: afinador cromático y herramientas de práctica con audio local."
+    />
+    <meta property="og:title" content="Wi-Tuner — Afinador cromático" />
+    <meta
+      property="og:description"
+      content="Afina con claridad. El audio se procesa en tu dispositivo."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Wi-Tuner — Afinador cromático</title>
+  </head>
+  <body>
+    <main class="mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
+      <nav class="flex items-center justify-between gap-4">
+        <a class="text-xl font-bold" href="/" aria-label="Wi-Tuner, inicio">Wi-Tuner</a>
+        <label class="flex items-center gap-2 text-sm">
+          <span data-i18n="language">Idioma</span>
+          <select id="language" aria-label="Language">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+      </nav>
+
+      <section class="grid flex-1 items-center gap-10 py-16 md:grid-cols-2">
+        <div>
+          <p class="font-semibold uppercase tracking-[0.16em] text-sky-800" data-i18n="eyebrow">
+            {copy.eyebrow}
+          </p>
+          <h1 class="mt-4 text-5xl font-bold tracking-tight md:text-6xl" data-i18n="heading">
+            {copy.heading}
+          </h1>
+          <p class="mt-6 max-w-xl text-lg leading-8 text-slate-600" data-i18n="description">
+            {copy.description}
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a class="wi-cta wi-cta-primary" href={appUrl} data-i18n="open">{copy.open}</a>
+            <a class="wi-cta wi-cta-secondary" href="https://github.com/wiarch/wi-tuner" data-i18n="github">
+              {copy.github}
+            </a>
+          </div>
+        </div>
+
+        <ul class="grid gap-4" aria-label="Wi-Tuner features">
+          <li class="wi-feature" data-i18n="featureOne">{copy.featureOne}</li>
+          <li class="wi-feature" data-i18n="featureTwo">{copy.featureTwo}</li>
+          <li class="wi-feature" data-i18n="featureThree">{copy.featureThree}</li>
+        </ul>
+      </section>
+
+      <footer class="border-t border-slate-200 py-6 text-sm text-slate-600">
+        Wi-Tuner · WI Arch
+      </footer>
+    </main>
+
+    <script>
+      import { landingCopy } from "../content";
+
+      const selector = document.querySelector("#language");
+      const saved = localStorage.getItem("wi-tuner-language");
+      const systemLanguage = navigator.language.toLowerCase().startsWith("es")
+        ? "es"
+        : "en";
+      const initial = saved === "en" || saved === "es" ? saved : systemLanguage;
+
+      function applyLanguage(language) {
+        document.documentElement.lang = language;
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.dataset.i18n;
+          if (key && key in landingCopy[language]) {
+            element.textContent = landingCopy[language][key];
+          }
+        });
+      }
+
+      if (selector) {
+        selector.value = initial;
+        selector.addEventListener("change", () => {
+          const language = selector.value === "es" ? "es" : "en";
+          localStorage.setItem("wi-tuner-language", language);
+          applyLanguage(language);
+        });
+      }
+
+      applyLanguage(initial);
+    </script>
+  </body>
+</html>
+

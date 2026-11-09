@@ -1,6 +1,6 @@
-# Contributing to WI Tone
+# Contributing to WI Tuner
 
-Thank you for helping improve WI Tone.
+Thank you for helping improve WI Tuner.
 
 ## Before contributing
 

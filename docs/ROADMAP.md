@@ -1,68 +1,34 @@
-# WI Tone — Roadmap
+# Wi-Tuner — Roadmap
 
-This roadmap separates existing functionality from planned work. A roadmap item is not implemented until code and tests demonstrate it.
+Las casillas reflejan trabajo implementado y verificado, no solo intención.
 
-## Phase 0 — Product foundation
+## Fase 0 — Cimientos
 
-- [x] Define WI Tone as a digital instrument tuner.
-- [x] Document current stack and existing audio implementation.
-- [x] Identify legacy worship-planning modules as outside the primary product scope.
-- [ ] Establish automated baseline checks for the current repository.
-- [ ] Add product screenshots and a concise demo once the interface is ready.
+- [x] Adoptar Wi-Tuner como identidad en código, paquetes, interfaz, documentación y CI.
+- [x] Establecer pnpm workspaces y Turborepo.
+- [x] Configurar TypeScript estricto, ESLint, Prettier y Vitest.
+- [x] Crear workspaces iniciales para app, landing, DSP y UI.
+- [x] Preparar app bilingüe y PWA, y landing en inglés y español.
+- [x] Registrar la transición reversible desde Laravel en `docs/DECISIONS.md`.
+- [ ] Validar permisos de micrófono y el shell offline en dispositivos reales.
 
-## Phase 1 — Reliable core tuner
+## Fase 1 — Afinador confiable
 
-- [x] Extract pitch and note calculations into independently testable modules.
-- [x] Add deterministic tests with generated reference frequencies.
-- [x] Introduce a YIN-style detector with a signal clarity estimate; real-device validation remains pending.
-- [ ] Add smoothing/hysteresis to reduce unstable visual updates.
-- [ ] Handle silence, noise, weak input, clipping and multiple simultaneous notes.
-- [x] Release microphone tracks and audio nodes when stopping the tuner or leaving the page.
-- [x] Add initial unsupported-browser, permission-denied and microphone-device error states.
-- [ ] Expand browser compatibility and device recovery handling.
-- [ ] Validate tuning behavior on real guitar strings across a range of devices.
+- [ ] Integrar detección de tono en tiempo real en la app.
+- [ ] Añadir suavizado e histéresis para estabilizar nota y cents.
+- [ ] Tratar silencio, ruido, señal débil, clipping y notas simultáneas.
+- [ ] Implementar calibración A4 y selector cromático/por cuerda.
+- [ ] Probar guitarra y bajo en navegadores y micrófonos reales.
+- [ ] Completar el modo estroboscópico con mediciones reales de latencia.
 
-## Phase 2 — Instruments and presets
+## Fase 2 — Instrumentos y práctica
 
-- [x] Introduce a data-driven instrument/tuning preset model.
-- [x] Add standard six-string guitar tuning.
-- [x] Add standard four-string bass tuning.
-- [x] Add selectable Drop D reference tunings for guitar and bass.
-- [ ] Add chromatic and string-by-string target comparison modes.
-- [ ] Expand alternative guitar tunings beyond Drop D.
-- [ ] Expand alternative bass tunings beyond Drop D.
-- [ ] Make A4 reference pitch configurable.
-- [ ] Add custom tuning profiles after preset behavior is stable.
+- [ ] Ampliar presets de guitarra y bajo, y añadir ukelele y violín.
+- [ ] Mejorar metrónomo, tonos de referencia y accesibilidad.
+- [ ] Guardar preferencias locales y habilitar borrar datos locales.
+- [ ] Verificar comportamiento offline y recuperación de permisos.
 
-## Phase 3 — Practice experience
+## Fase 3 — Plataformas
 
-- [ ] Redesign tuner UI around a clear, mobile-first instrument workflow.
-- [ ] Improve the metronome and its accessibility.
-- [ ] Add useful reference-tone controls.
-- [ ] Improve theory/reference tools without making them the main navigation.
-- [ ] Add local preferences for selected instrument and tuning.
-
-## Phase 4 — Platform reach
-
-- [ ] Evaluate PWA installation and offline application shell.
-- [ ] Test microphone behavior across supported mobile browsers.
-- [ ] Evaluate desktop packaging.
-- [ ] Evaluate native mobile packaging only after validating the web experience.
-- [ ] Document supported browsers and known hardware limitations.
-
-## Phase 5 — Legacy module decision
-
-- [ ] Audit song, chord, category, contact and service-plan modules.
-- [ ] Map database and route dependencies.
-- [ ] Decide whether each module should be removed, archived or moved to a separate repository.
-- [ ] Prepare a migration and backup plan before deleting data or migrations.
-- [ ] Execute the cleanup in a dedicated change set.
-
-## Release criteria
-
-A release focused on tuning should not be considered ready until:
-- Pitch conversion and preset logic have automated tests.
-- Microphone lifecycle cleanup is verified.
-- Permission and unsupported-device states are usable.
-- Guitar and bass presets have been validated with known frequencies and real instruments.
-- Documentation accurately reflects the supported browser/device matrix.
+- [ ] Crear proyectos nativos Android e iOS con Capacitor.
+- [ ] Validar micrófono, latencia, instalación y actualizaciones en dispositivos.

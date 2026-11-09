@@ -62,8 +62,8 @@ export function destroySelect2(scope = document) {
 
 function boot() {
     initSelect2();
-    window.witone = {
-        ...(window.witone ?? {}),
+    window.wituner = {
+        ...(window.wituner ?? {}),
         initSelect2,
         destroySelect2,
     };
