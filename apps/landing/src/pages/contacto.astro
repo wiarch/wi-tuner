@@ -1,0 +1,21 @@
+---
+import Base from "../layouts/Base.astro";
+import { CONTACT_EMAIL, landing } from "../content";
+
+const page = landing.es;
+---
+
+<Base
+    language="es"
+    title={`${page.contactPageTitle} — Wi-Tuner`}
+    description={page.contactPageLead}
+    path="/contacto"
+>
+    <main id="contenido" class="shell prose">
+        <h1>{page.contactPageTitle}</h1>
+        <p>{page.contactPageLead}</p>
+        <p>
+            <a class="button button-primary" href={`mailto:${CONTACT_EMAIL}`}>{page.contactWrite}</a>
+        </p>
+    </main>
+</Base>

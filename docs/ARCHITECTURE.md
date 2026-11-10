@@ -1,23 +1,23 @@
 # Wi-Tuner — Arquitectura
 
-## Estado de Fase 0
-
-El repositorio empieza una transición gradual. La aplicación Laravel existente se conserva temporalmente para proteger sus rutas y datos; la nueva arquitectura vive en los workspaces y no depende del backend Laravel.
-
 ## Monorepo
 
-- `apps/app`: React 19, Vite, TypeScript, PWA, i18next, Zustand, idb-keyval y Capacitor.
-- `apps/landing`: Astro y Tailwind CSS.
-- `packages/dsp-core`: cálculo musical y procesamiento DSP en TypeScript puro, sin dependencias de UI.
-- `packages/ui`: componentes React compartidos con Tailwind CSS v4 y Radix UI.
-- Turborepo orquesta build, test, lint y typecheck. pnpm administra dependencias y workspaces.
+- `apps/app`: React 19, Vite, TypeScript, PWA, i18next, Zustand, idb-keyval y Capacitor (`com.wituner.app`).
+- `apps/landing`: Astro, Tailwind CSS, español en `/` e inglés en `/en/`.
+- `packages/dsp-core`: detección de tono, temperamentos, notación y el scheduler del metrónomo. TypeScript puro, sin UI ni audio.
+- `packages/ui`: componentes React compartidos, Tailwind CSS v4 y Radix UI.
+- Turborepo orquesta build, test, lint y typecheck. pnpm administra los workspaces.
 
-## Límites técnicos
+## Afinador y metrónomo
 
-El motor DSP no puede depender de React, DOM, APIs de audio ni almacenamiento. La app obtiene muestras del micrófono con consentimiento y pasa buffers en memoria al motor. Cualquier implementación de captura debe usar `echoCancellation: false`, `noiseSuppression: false` y `autoGainControl: false`, y liberar pistas y nodos cuando se detenga.
+La app pide el micrófono con `echoCancellation`, `noiseSuppression` y `autoGainControl` en falso. Un AudioWorklet entrega ventanas en memoria al motor YIN. El metrónomo usa otro `AudioContext` y el scheduler de `dsp-core`. Nada de ese audio se graba ni se envía.
 
-La landing no accede al micrófono. La app y la PWA comparten el mismo código que después empaquetará Capacitor para Android e iOS.
+Las preferencias viven en IndexedDB en la web y en Capacitor Preferences en el dispositivo. «Borrar todos mis datos» vacía esos almacenes, la caché y los temperamentos personalizados, después de una confirmación.
+
+## Empaquetado
+
+`vite-plugin-pwa` genera el service worker. Capacitor publica `android/` e `ios/` desde `apps/app/dist`. La landing no pide el micrófono. Cómo compilar y firmar está en `docs/RELEASE.md`. La privacidad está en `docs/PRIVACY.md`.
 
 ## Aplicación heredada
 
-Laravel, Blade y sus módulos de canciones, contactos y planes se mantienen en la raíz durante la transición. No se consideran parte del nuevo producto. Su extracción se hará en una fase aparte, con inventario de rutas, datos y usuarios, y un plan de rollback.
+Laravel, Blade y sus módulos de canciones, contactos y planes siguen en la raíz. No forman parte del producto nuevo. No cargan fuentes ni scripts de terceros. Su extracción queda para una migración aparte, con inventario y rollback.

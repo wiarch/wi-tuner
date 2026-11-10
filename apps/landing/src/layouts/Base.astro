@@ -1,0 +1,117 @@
+---
+import {
+    CONTACT_EMAIL,
+    SITE_ORIGIN,
+    landing,
+    localizedPath,
+    type LandingLanguage,
+} from "../content";
+import "../styles/global.css";
+
+interface Props {
+    language: LandingLanguage;
+    title: string;
+    description: string;
+    path: string;
+    jsonLd?: unknown;
+}
+
+const { language, title, description, path, jsonLd } = Astro.props;
+const page = landing[language];
+const origin = Astro.site?.origin ?? SITE_ORIGIN;
+const canonicalPath = localizedPath(path, language);
+const canonical = new URL(canonicalPath, origin).href;
+const spanish = new URL(localizedPath(path, "es"), origin).href;
+const english = new URL(localizedPath(path, "en"), origin).href;
+const otherPath =
+        language === "es" ? localizedPath(path, "en") : localizedPath(path, "es");
+const appUrl = import.meta.env.PUBLIC_APP_URL ?? "https://app.wi-tuner.app/";
+const home = localizedPath("/", language);
+const privacy = localizedPath("/privacidad", language);
+const contact = localizedPath("/contacto", language);
+---
+
+<!doctype html>
+<html lang={language}>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="theme-color" content="#12312e" />
+        <meta name="color-scheme" content="light dark" />
+        <link rel="canonical" href={canonical} />
+        <link rel="alternate" hreflang="es" href={spanish} />
+        <link rel="alternate" hreflang="en" href={english} />
+        <link rel="alternate" hreflang="x-default" href={spanish} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Wi-Tuner" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:locale" content={page.locale} />
+        <meta
+            property="og:locale:alternate"
+            content={language === "es" ? "en_US" : "es_ES"}
+        />
+        <meta property="og:image" content={new URL("/og.png", origin).href} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Wi-Tuner" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={new URL("/og.png", origin).href} />
+        <meta name="twitter:image:alt" content="Wi-Tuner" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        {
+            jsonLd && (
+                <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+            )
+        }
+    </head>
+    <body>
+        <a class="skip" href="#contenido">{page.skip}</a>
+        <header class="shell header">
+            <a class="brand" href={home} aria-label="Wi-Tuner">
+                <svg viewBox="0 0 64 64" width="36" height="36" aria-hidden="true">
+                    <rect width="64" height="64" rx="14" fill="currentColor"></rect>
+                    <path
+                        d="M24 16v18M40 16v18M24 32c0 8 4 12 8 12s8-4 8-12M32 44v10"
+                        fill="none"
+                        stroke="#f7f4ee"
+                        stroke-width="4"
+                        stroke-linecap="round"></path>
+                </svg>
+                <span>Wi-Tuner</span>
+            </a>
+            <nav class="nav" aria-label={page.navLabel}>
+                <a href={`${home}#funciones`}>{page.featuresNav}</a>
+                <a href={`${home}#instrumentos`}>{page.instrumentsNav}</a>
+                <a href={`${home}#pasos`}>{page.stepsNav}</a>
+                <a href={`${home}#privacidad`}>{page.privacyNav}</a>
+                <a href={`${home}#preguntas`}>{page.faqNav}</a>
+            </nav>
+            <a
+                class="lang"
+                href={otherPath}
+                hreflang={language === "es" ? "en" : "es"}
+                lang={language === "es" ? "en" : "es"}
+            >
+                <span class="visually-hidden">{page.languageLabel}: </span>{page.otherLanguage}
+            </a>
+        </header>
+        <slot />
+        <footer class="shell footer">
+            <p>{page.footerNote}</p>
+            <nav aria-label={page.contactLink}>
+                <a href={privacy}>{page.privacyLink}</a>
+                <a href={contact}>{page.contactLink}</a>
+                <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+                <a href={appUrl}>{page.tryBrowser}</a>
+            </nav>
+        </footer>
+    </body>
+</html>

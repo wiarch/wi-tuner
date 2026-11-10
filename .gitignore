@@ -34,3 +34,8 @@ Thumbs.db
 
 **/node_modules/
 **/coverage/
+*.jks
+*.keystore
+keystore.properties
+/test-results/
+/playwright-report/

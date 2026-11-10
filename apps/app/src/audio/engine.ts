@@ -6,6 +6,7 @@ import {
     type NoteReading,
     type PitchEstimate,
 } from "@wi-tuner/dsp-core";
+import type { AlgorithmMode } from "../store/preferences";
 
 export type AudioEngineState =
     | "idle"
@@ -82,6 +83,16 @@ export interface AudioEngineSnapshot {
     frame: AudioEngineFrame | null;
     sampleRate: number | null;
 }
+
+export interface AudioDetectionConfiguration {
+    sensitivity: number;
+    autoSensitivity: boolean;
+    algorithmMode: AlgorithmMode;
+    filterLocked: boolean;
+}
+
+/** Hold the detector on the current pitch so a harmonic cannot steal it. */
+const FILTER_LOCK_CENTS = 150;
 
 export interface AudioLifecycleHandlers {
     onVisibilityChange(state: "visible" | "hidden"): void;
@@ -164,6 +175,14 @@ export class AudioEngine {
     private lastOptions: AudioInputOptions | null = null;
     private disposed = false;
     private isVisible = true;
+    private detection: AudioDetectionConfiguration = {
+        sensitivity: 0.5,
+        autoSensitivity: true,
+        algorithmMode: "balanced",
+        filterLocked: false,
+    };
+    private filteredFrequency: number | null = null;
+    private filterAnchor: number | null = null;
 
     constructor(
         private readonly provider: AudioInputProvider,
@@ -171,6 +190,17 @@ export class AudioEngine {
     ) {}
 
     getSnapshot = (): AudioEngineSnapshot => this.snapshot;
+
+    configureDetection(
+        configuration: Partial<AudioDetectionConfiguration>,
+    ): void {
+        const previousFilter = this.detection.filterLocked;
+        this.detection = { ...this.detection, ...configuration };
+        if (previousFilter !== this.detection.filterLocked) {
+            this.filteredFrequency = null;
+            this.filterAnchor = null;
+        }
+    }
 
     subscribe = (
         listener: (snapshot: AudioEngineSnapshot) => void,
@@ -353,10 +383,46 @@ export class AudioEngine {
     private receiveFrame(frame: AudioInputFrame): void {
         this.lastFrameAt = this.clock.now();
         const processingStartedAt = this.clock.now();
-        const estimate = detectPitch(frame.samples, frame.sampleRate, {
-            maxFrequency: Math.min(MAX_PITCH_HZ, frame.sampleRate * 0.48),
-            minFrequency: MIN_PITCH_HZ,
+        const rms = this.snapshot.frame?.estimate?.rms ?? 0;
+        const sensitivity = this.detection.autoSensitivity
+            ? Math.max(0.35, Math.min(0.85, 0.72 - rms))
+            : this.detection.sensitivity;
+        const mode = this.detection.algorithmMode;
+        const baseClarity =
+            mode === "fast" ? 0.86 : mode === "precise" ? 0.7 : 0.78;
+        const modeMin = mode === "fast" ? 45 : MIN_PITCH_HZ;
+        const modeMax = Math.min(MAX_PITCH_HZ, frame.sampleRate * 0.48);
+        const detected = detectPitch(frame.samples, frame.sampleRate, {
+            maxFrequency: modeMax,
+            minFrequency: modeMin,
+            minimumClarity: Math.max(0.55, baseClarity - sensitivity * 0.12),
+            silenceThreshold: 0.008 - sensitivity * 0.006,
         });
+        const outsideLock =
+            detected !== null &&
+            this.detection.filterLocked &&
+            this.filterAnchor !== null &&
+            Math.abs(1200 * Math.log2(detected.frequency / this.filterAnchor)) >
+                FILTER_LOCK_CENTS;
+        const rawEstimate = outsideLock ? null : detected;
+        if (rawEstimate && this.detection.filterLocked) {
+            this.filterAnchor =
+                this.filterAnchor === null
+                    ? rawEstimate.frequency
+                    : this.filterAnchor * 0.92 + rawEstimate.frequency * 0.08;
+            this.filteredFrequency =
+                this.filteredFrequency === null
+                    ? rawEstimate.frequency
+                    : this.filteredFrequency * 0.72 +
+                      rawEstimate.frequency * 0.28;
+        } else if (rawEstimate) {
+            this.filterAnchor = null;
+            this.filteredFrequency = rawEstimate.frequency;
+        }
+        const estimate =
+            rawEstimate && this.detection.filterLocked && this.filteredFrequency
+                ? { ...rawEstimate, frequency: this.filteredFrequency }
+                : rawEstimate;
         const note =
             estimate === null ? null : frequencyToNote(estimate.frequency);
         const analysisDurationMs = Math.max(

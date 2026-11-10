@@ -1,0 +1,95 @@
+---
+import { STORE_LINKS, type LandingPage } from "../content";
+
+interface Props {
+    page: LandingPage;
+    appUrl: string;
+}
+
+const { page, appUrl } = Astro.props;
+---
+
+<main id="contenido">
+    <section class="shell hero">
+        <div>
+            <p class="eyebrow">{page.eyebrow}</p>
+            <h1>{page.heading}</h1>
+            <p class="lead">{page.lead}</p>
+            <div class="actions">
+                <a class="button button-primary" href={appUrl}>{page.tryBrowser}</a>
+                <a class="button" href={STORE_LINKS.play}>{page.playStore}</a>
+                <a class="button" href={STORE_LINKS.appStore}>{page.appStore}</a>
+            </div>
+        </div>
+        <svg class="mark" viewBox="0 0 320 360" role="img" aria-label="Wi-Tuner">
+            <title>Wi-Tuner</title>
+            <rect x="16" y="16" width="288" height="328" rx="36" fill="var(--paper)" stroke="currentColor" stroke-width="4"></rect>
+            <path
+                d="M118 70v90M202 70v90M118 150c0 42 22 64 42 64s42-22 42-64M160 214v70"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="14"
+                stroke-linecap="round"></path>
+            <circle cx="160" cy="300" r="10" fill="currentColor"></circle>
+        </svg>
+    </section>
+
+    <section class="shell" id="funciones" aria-labelledby="funciones-title">
+        <h2 id="funciones-title">{page.featuresTitle}</h2>
+        <p class="intro">{page.featuresIntro}</p>
+        <ul class="cards">
+            {
+                page.features.map((feature) => (
+                    <li>
+                        <h3>{feature.title}</h3>
+                        <p>{feature.text}</p>
+                    </li>
+                ))
+            }
+        </ul>
+    </section>
+
+    <section class="shell" id="instrumentos" aria-labelledby="instrumentos-title">
+        <h2 id="instrumentos-title">{page.instrumentsTitle}</h2>
+        <p class="intro">{page.instrumentsIntro}</p>
+        <ul class="pills">
+            {page.instruments.map((name) => <li>{name}</li>)}
+        </ul>
+    </section>
+
+    <section class="shell" id="pasos" aria-labelledby="pasos-title">
+        <h2 id="pasos-title">{page.stepsTitle}</h2>
+        <ol class="steps">
+            {
+                page.steps.map((step, index) => (
+                    <li>
+                        <span aria-hidden="true">{index + 1}</span>
+                        <h3>{step.title}</h3>
+                        <p>{step.text}</p>
+                    </li>
+                ))
+            }
+        </ol>
+    </section>
+
+    <section class="band" id="privacidad" aria-labelledby="privacidad-title">
+        <div class="shell">
+            <h2 id="privacidad-title">{page.privacyBanner}</h2>
+            <p>{page.privacyText}</p>
+        </div>
+    </section>
+
+    <section class="shell" id="preguntas" aria-labelledby="preguntas-title">
+        <h2 id="preguntas-title">{page.faqTitle}</h2>
+        <div class="faq">
+            {
+                page.faq.map((item) => (
+                    <details>
+                        <summary>{item.question}</summary>
+                        <p>{item.answer}</p>
+                    </details>
+                ))
+            }
+        </div>
+    </section>
+</main>

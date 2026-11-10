@@ -1,4 +1,4 @@
-import { noteToFrequency, type NoteName } from "./theory";
+import { noteToFrequency, type NoteName, type NoteOptions } from "./theory";
 
 export type InstrumentId =
     | "guitar"
@@ -268,8 +268,13 @@ export interface ClosestString {
 export function findClosestString(
     frequency: number,
     tuningPreset: TuningPreset,
-    referencePitch = 440,
+    referenceOrOptions: number | NoteOptions = 440,
 ): ClosestString | null {
+    const options =
+        typeof referenceOrOptions === "number"
+            ? { referencePitch: referenceOrOptions }
+            : referenceOrOptions;
+    const referencePitch = options.referencePitch ?? 440;
     if (
         !Number.isFinite(frequency) ||
         frequency <= 0 ||
@@ -279,12 +284,9 @@ export function findClosestString(
     )
         return null;
     let closest: ClosestString | null = null;
+    const targetOptions = { ...options, transposeSemitones: 0 };
     for (const string of tuningPreset.strings) {
-        const target = noteToFrequency(
-            string.note,
-            string.octave,
-            referencePitch,
-        );
+        const target = noteToFrequency(string.note, string.octave, targetOptions);
         if (target === null) continue;
         const cents = 1200 * Math.log2(frequency / target);
         if (!closest || Math.abs(cents) < closest.distanceCents)
@@ -302,11 +304,11 @@ export function findClosestInstrumentString(
     frequency: number,
     instrumentId: string,
     tuningId = "standard",
-    referencePitch = 440,
+    referenceOrOptions: number | NoteOptions = 440,
 ): ClosestString | null {
     return findClosestString(
         frequency,
         getTuningPreset(instrumentId, tuningId),
-        referencePitch,
+        referenceOrOptions,
     );
 }

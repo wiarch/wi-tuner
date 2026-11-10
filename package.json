@@ -12,7 +12,7 @@
     "dev": "vite",
     "dev:app": "pnpm --filter @wi-tuner/app dev",
     "dev:landing": "pnpm --filter @wi-tuner/landing dev",
-    "test": "pnpm run test:workspaces && node --test tests/js/*.test.js",
+    "test": "pnpm run test:workspaces && node --test tests/js/*.test.js && node scripts/check-external-hosts.mjs",
     "test:workspaces": "turbo run test --filter=./apps/** --filter=./packages/**",
     "test:e2e": "playwright test",
     "lint": "turbo run lint --filter=./apps/** --filter=./packages/**",

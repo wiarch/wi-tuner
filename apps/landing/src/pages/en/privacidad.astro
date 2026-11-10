@@ -1,0 +1,25 @@
+---
+import Base from "../../layouts/Base.astro";
+import { landing } from "../../content";
+
+const page = landing.en;
+---
+
+<Base
+    language="en"
+    title={`${page.privacyPageTitle} — Wi-Tuner`}
+    description={page.privacyPage[0].text}
+    path="/privacidad"
+>
+    <main id="contenido" class="shell prose">
+        <h1>{page.privacyPageTitle}</h1>
+        {
+            page.privacyPage.map((section) => (
+                <section>
+                    <h2>{section.heading}</h2>
+                    <p>{section.text}</p>
+                </section>
+            ))
+        }
+    </main>
+</Base>

@@ -303,6 +303,15 @@ describe("instrument catalog", () => {
                 "drop-d",
             )?.string.note,
         ).toBe("D");
+        const concertE = noteToFrequency("E", 2)!;
+        const transposedDisplay = findClosestInstrumentString(
+            concertE,
+            "guitar",
+            "standard",
+            { transposeSemitones: 2 },
+        );
+        expect(transposedDisplay?.string.label).toBe("E");
+        expect(transposedDisplay?.cents).toBeCloseTo(0, 5);
         expect(
             findClosestString(1, { id: "none", name: "none", strings: [] }),
         ).toBeNull();

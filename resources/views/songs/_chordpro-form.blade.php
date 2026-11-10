@@ -169,6 +169,5 @@
 </div>
 
 @push('head')
-    <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,500&display=swap" rel="stylesheet">
     @vite(['resources/js/chord-visual-editor.js'])
 @endpush

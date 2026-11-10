@@ -1,68 +1,61 @@
 # Wi-Tuner
 
-**Afinador cromático y herramientas de práctica, con procesamiento de audio local.**
-
-Wi-Tuner ayuda a afinar instrumentos con claridad desde el navegador y prepara una misma base para web, PWA y futuras aplicaciones móviles. El audio del afinador se analizará en el dispositivo y no se grabará ni se transmitirá.
-
-> Estado: Fase 0. El repositorio conserva temporalmente la aplicación Laravel existente y añade los cimientos del nuevo monorepo. La app React y la landing están inicializadas; el flujo completo de afinación, el modo estroboscópico y las plataformas nativas se desarrollarán en fases posteriores.
+Afinador cromático con estroboscopio y metrónomo. La misma app corre en el navegador (PWA), Android e iOS. El audio se analiza en el dispositivo: no se graba y no se envía. No hay cuenta, anuncios ni analítica.
 
 ## Estructura
 
-- `apps/app`: aplicación React + Vite, PWA, i18next, Zustand, IndexedDB y configuración de Capacitor.
-- `apps/landing`: landing Astro con contenido en español e inglés.
-- `packages/dsp-core`: motor musical y DSP en TypeScript puro.
-- `packages/ui`: componentes React compartidos, Tailwind CSS v4 y Radix UI.
-- `app/`, `resources/`, `routes/` y `composer.json`: aplicación Laravel existente, conservada durante la transición.
-- `docs/DECISIONS.md`: decisiones de migración y alcance.
+- `apps/app`: React, Vite, PWA, i18next, Zustand, IndexedDB y Capacitor.
+- `apps/landing`: landing Astro en español e inglés.
+- `packages/dsp-core`: tono, temperamentos, notación y scheduler del metrónomo.
+- `packages/ui`: componentes React, Tailwind CSS v4 y Radix UI.
+- `app/`, `resources/`, `routes/` y `composer.json`: Laravel heredado, fuera del producto nuevo.
+- `docs/PRIVACY.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, `docs/RELEASE.md`.
 
 ## Requisitos
 
-- Node.js 22.23.4 o superior.
+- Node.js 22 o superior (CI usa 24).
 - pnpm 11.25.0.
-- PHP 8.3 y Composer para ejecutar la aplicación Laravel conservada.
+- JDK 21 y Android SDK para compilar Android. Xcode en macOS para iOS.
+- PHP 8.3 y Composer solo si se arranca el Laravel heredado.
 
-## Preparar y verificar el monorepo
+## Verificar
 
 ```sh
 pnpm install
-pnpm build
-pnpm test
 pnpm lint
 pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
 ```
 
-Desarrollo de la nueva app y landing:
+`pnpm test` incluye la auditoría de hosts externos.
+
+Desarrollo:
 
 ```sh
 pnpm dev:app
 pnpm dev:landing
 ```
 
-La app muestra por ahora la estructura del producto, detecta inglés o español, instala su service worker y usa los paquetes compartidos. El afinador con micrófono se implementará en la siguiente fase.
+La app queda en `http://127.0.0.1:5173` y la landing en `http://127.0.0.1:4321`.
 
-## Aplicación Laravel conservada
+## Privacidad
 
-La aplicación anterior se mantiene para no eliminar rutas, datos o pantallas durante la transición. Para iniciarla, instala Composer, configura `.env` y ejecuta:
+No se recopilan datos. El detalle está en [docs/PRIVACY.md](docs/PRIVACY.md). En Ajustes, «Borrar todos mis datos» vacía las preferencias, los temperamentos personalizados y la caché local tras una confirmación.
+
+## Tiendas
+
+Compilar y firmar: [docs/RELEASE.md](docs/RELEASE.md). Aún faltan la firma de publicación, el dominio definitivo y las cuentas de desarrollador.
+
+## Laravel heredado
 
 ```sh
 composer install
 php artisan key:generate
-pnpm install
 composer run dev
 ```
 
-Su interfaz heredada no representa aún el diseño final de Wi-Tuner. La extracción o eliminación de módulos antiguos se hará con una migración revisada y reversible.
-
-## Privacidad y seguridad
-
-- El acceso al micrófono requiere consentimiento del navegador y un contexto HTTPS seguro.
-- La captura futura debe desactivar echo cancellation, noise suppression y automatic gain control.
-- El audio se procesa en memoria en el dispositivo; no se graba ni se transmite.
-- Las preferencias se almacenan localmente y la app ofrecerá una acción para borrar los datos locales.
-- No hay analítica de terceros, anuncios ni SDK publicitarios.
-
-Consulta [SECURITY.md](docs/SECURITY.md), [PRODUCT.md](docs/PRODUCT.md), [ARCHITECTURE.md](docs/ARCHITECTURE.md) y [ROADMAP.md](docs/ROADMAP.md).
-
 ## Licencia
 
-Este proyecto se distribuye bajo la [licencia MIT](LICENSE) y forma parte del ecosistema WI Arch.
+[MIT](LICENSE).

@@ -1,16 +1,216 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  color-scheme: light;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background: #f8fafc;
+    color-scheme: light;
+    font-family:
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    background: #f8fafc;
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
 }
 
+.app-shell {
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+.control {
+    min-height: 2.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.6rem;
+    background: white;
+    color: #0f172a;
+    padding: 0.45rem 0.65rem;
+}
+.control:focus-visible,
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+    outline: 3px solid #0284c7;
+    outline-offset: 2px;
+}
+.metric {
+    min-width: 0;
+}
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: 1rem;
+}
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+.tuner-card {
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+}
+.tune-status {
+    border-color: #cbd5e1;
+    color: #334155;
+}
+.tuner-card.is-in-tune {
+    border-color: var(--tune-color);
+    box-shadow:
+        0 0 0 3px color-mix(in srgb, var(--tune-color) 25%, transparent),
+        0 8px 30px color-mix(in srgb, var(--tune-color) 18%, transparent);
+}
+:root:not(.dark) .tuner-card.is-in-tune {
+    background: color-mix(in srgb, var(--tune-color) 16%, white);
+}
+.tune-status.is-in-tune {
+    border-color: var(--tune-color);
+    color: #0f172a;
+    background: color-mix(in srgb, var(--tune-color) 18%, white);
+}
+.sensitivity-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.overtone-option {
+    display: inline-flex;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.65rem;
+    background: white;
+    color: #0f172a;
+    font-weight: 700;
+    cursor: pointer;
+}
+.overtone-option.is-selected {
+    border-color: var(--tune-color);
+    background: color-mix(in srgb, var(--tune-color) 18%, white);
+}
+.overtone-option:focus-within {
+    outline: 3px solid #0284c7;
+    outline-offset: 2px;
+}
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgb(15 23 42 / 0.65);
+}
+.modal-card {
+    width: min(100%, 32rem);
+    border-radius: 1rem;
+    background: white;
+    padding: 1.5rem;
+    color: #0f172a;
+    box-shadow: 0 20px 50px rgb(0 0 0 / 0.25);
+}
+.dark body {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+.dark .tuner-card,
+.dark .settings-panel,
+.dark .modal-card {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f8fafc;
+}
+.dark .metric,
+.dark .bg-slate-50 {
+    background: #334155;
+}
+.dark .control {
+    background: #0f172a;
+    color: #f8fafc;
+    border-color: #64748b;
+}
+.dark .text-slate-900,
+.dark .text-slate-700 {
+    color: #e2e8f0;
+}
+.dark .text-slate-600,
+.dark .text-slate-500 {
+    color: #cbd5e1;
+}
+.dark .border-slate-200 {
+    border-color: #475569;
+}
+.dark .tuner-card.is-in-tune {
+    border-color: var(--tune-color);
+}
+.dark .tune-status {
+    border-color: #64748b;
+    color: #e2e8f0;
+}
+.dark .tune-status.is-in-tune {
+    border-color: color-mix(in srgb, var(--tune-color) 65%, white);
+    color: #f8fafc;
+    background: color-mix(in srgb, var(--tune-color) 28%, #1e293b);
+}
+.dark .overtone-option {
+    border-color: #64748b;
+    background: #0f172a;
+    color: #f8fafc;
+}
+.metro-lamps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    min-height: 3.25rem;
+}
+.metro-lamp {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    border: 2px solid #94a3b8;
+    background: #e2e8f0;
+}
+.metro-lamp.is-accent {
+    border-color: #0072b2;
+}
+.metro-lamp.is-current {
+    background: #0072b2;
+    animation: metro-flash 0.12s ease-out;
+}
+@keyframes metro-flash {
+    from {
+        transform: scale(0.86);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+.dark .metronome-panel {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f8fafc;
+}
+.dark .metro-lamp {
+    background: #334155;
+    border-color: #64748b;
+}
+.dark .metro-lamp.is-current {
+    background: #38bdf8;
+}
+.dark .overtone-option.is-selected {
+    border-color: var(--tune-color);
+    background: color-mix(in srgb, var(--tune-color) 30%, #1e293b);
+}

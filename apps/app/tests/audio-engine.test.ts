@@ -312,3 +312,48 @@ describe("AudioEngine automatic recovery", () => {
         await engine.dispose();
     });
 });
+
+function sine(frequency: number, length = 8_192): Float32Array {
+    const sampleRate = 48_000;
+    return Float32Array.from({ length }, (_, index) =>
+        Math.sin((2 * Math.PI * frequency * index) / sampleRate),
+    );
+}
+
+describe("AudioEngine filter lock", () => {
+    it("keeps the detector on the held pitch and rejects a distant harmonic", async () => {
+        const { engine, provider } = setup();
+        engine.configureDetection({
+            filterLocked: false,
+            autoSensitivity: false,
+            sensitivity: 0.8,
+            algorithmMode: "balanced",
+        });
+        await engine.start(OPTIONS);
+        const send = (frequency: number) =>
+            provider.starts[0]!.callbacks.onFrame({
+                samples: sine(frequency),
+                sampleRate: 48_000,
+                timestamp: frequency,
+            });
+        send(440);
+        expect(engine.getSnapshot().frame?.estimate?.frequency).toBeCloseTo(
+            440,
+            0,
+        );
+        engine.configureDetection({ filterLocked: true });
+        send(440);
+        send(440);
+        expect(engine.getSnapshot().frame?.estimate?.frequency).toBeCloseTo(
+            440,
+            0,
+        );
+        send(880);
+        expect(engine.getSnapshot().frame?.estimate).toBeNull();
+        send(445);
+        const held = engine.getSnapshot().frame?.estimate?.frequency ?? 0;
+        expect(held).toBeGreaterThan(430);
+        expect(held).toBeLessThan(460);
+        await engine.dispose();
+    });
+});

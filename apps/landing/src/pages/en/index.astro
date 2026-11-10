@@ -1,0 +1,19 @@
+---
+import Home from "../../components/Home.astro";
+import Base from "../../layouts/Base.astro";
+import { landing, softwareApplicationLd } from "../../content";
+
+const page = landing.en;
+const appUrl = import.meta.env.PUBLIC_APP_URL ?? "https://app.wi-tuner.app/";
+const pageUrl = new URL("/en/", Astro.site ?? "https://wi-tuner.app").href;
+---
+
+<Base
+    language="en"
+    title={page.htmlTitle}
+    description={page.description}
+    path="/"
+    jsonLd={softwareApplicationLd(page, pageUrl)}
+>
+    <Home page={page} appUrl={appUrl} />
+</Base>

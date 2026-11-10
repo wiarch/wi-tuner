@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wi-Tuner</string>
+    <string name="title_activity_main">Wi-Tuner</string>
+    <string name="package_name">com.wituner.app</string>
+    <string name="custom_url_scheme">com.wituner.app</string>
+</resources>

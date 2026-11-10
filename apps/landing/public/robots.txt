@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wi-tuner.app/sitemap-index.xml
